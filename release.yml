@@ -18,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Automatic Release
-        uses: actions/automatic-release@v1
+        uses: Fulminazzo/java-automatic-release@v1
+        with:
+          java-version: 8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_NAME: ${{ github.event.repository.name }}

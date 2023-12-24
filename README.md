@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Automatic Release
-        uses: Fulminazzo/java-automatic-release@1.0
+        uses: Fulminazzo/java-automatic-release@v1
         with:
           java-version: 8
         env:
