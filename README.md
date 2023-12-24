@@ -35,6 +35,8 @@ jobs:
     steps:
       - name: Automatic Release
         uses: Fulminazzo/java-automatic-release@1.0
+        with:
+          java-version: 8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_NAME: ${{ github.event.repository.name }}
