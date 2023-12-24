@@ -1,0 +1,82 @@
+name: "Automatic Release"
+author: "Fulminazzo"
+description: "Automatically builds your Java project based on Maven or Gradle and publishes a new release with the found project and subprojects JAR files."
+
+branding:
+  icon: "upload-cloud"
+  color: "blue"
+
+inputs:
+  java-version:
+    description: "The Java version to use when setting up Java."
+    required: false
+    default: 11
+
+# Jobs that will execute
+runs:
+  using: "composite"
+  steps:
+    # Checkout repo to bring the script to the repository directory
+    - name: Checkout repo
+      uses: actions/checkout@v4
+    # Setup Java to the specified version
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java-version }}
+    # Find the current Build tool
+    - name: Setup Build Tool
+      id: getbuildtool
+      run: "echo BUILD_TOOL=$(bash $GITHUB_ACTION_PATH/get_build_tool.sh) >> $GITHUB_OUTPUT"
+      shell: bash
+    - name: Check Valid Build Tool
+      if: ${{ steps.getbuildtool.outputs.BUILD_TOOL == 'JAVA' }}
+      run: |-
+        echo "This Github Action does NOT support building from raw Java."
+        echo "Please use Maven or Gradle to build your projects!"
+        exit 1
+    # Build using Maven
+    - name: Build Maven
+      id: maven
+      if: ${{ steps.getbuildtool.outputs.BUILD_TOOL == 'MAVEN' }}
+      run: |-
+        /usr/bin/mvn package
+        echo VARIABLES="pom.xml pom.xml modules target/ (?<=<version>)([0-9.]+(-SNAPSHOT)?) (?<=<module>)([^<]+)" >> $GITHUB_OUTPUT
+    # Build using Gradle
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      if: ${{ steps.getbuildtool.outputs.BUILD_TOOL == 'GRADLE' }}
+    - name: Build Gradle
+      id: gradle
+      if: ${{ steps.getbuildtool.outputs.BUILD_TOOL == 'GRADLE' }}
+      run: |-
+        ./gradlew build
+        echo VARIABLES="build.gradle settings.gradle include build/libs/ (?<=version\s=\s(\"|'))([0-9.]+(-SNAPSHOT)?) (?<=include\s(\"|'))([^\"']+)" >> $GITHUB_OUTPUT
+    # Obtain the Project version and modules
+    - name: Gather Project Info
+      id: gatherinfo
+      env:
+        MAVEN_VARS: ${{ steps.maven.outputs.VARIABLES }}
+        GRADLE_VARS: ${{ steps.gradle.outputs.VARIABLES }}
+      run: |-
+        VARS=$MAVEN_VARS
+        test "$VARS" == "" && VARS=$GRADLE_VARS
+        VARS=($VARS)
+        export BUILD_FILE="${VARS[0]}"
+        export MODULES_FILE="${VARS[1]}"
+        export MODULES_ID="${VARS[2]}"
+        export OUTPUT_DIR="${VARS[3]}"
+        export VERSION_REGEX="${VARS[4]}"
+        export MODULES_REGEX="${VARS[5]}"
+        bash $GITHUB_ACTION_PATH/gather_buildtool_facts.sh
+    - name: Release Project
+      env:
+        VERSION: ${{ steps.gatherinfo.outputs.VERSION }}
+        FILES: ${{ steps.gatherinfo.outputs.FILES }}
+        BUILD_TOOL: ${{ steps.getbuildtool.outputs.BUILD_TOOL }}
+      run: |-
+        export VERSION=$VERSION
+        export FILES=$FILES
+        export BUILD_TOOL=$BUILD_TOOL
+        bash $GITHUB_ACTION_PATH/release.sh
