@@ -1,6 +1,6 @@
-name: "Automatic Release"
+name: "Java Automatic Release"
 author: "Fulminazzo"
-description: "Automatically builds your Java project based on Maven or Gradle and publishes a new release with the found project and subprojects JAR files."
+description: "Automatically builds your Java project and publishes a new release with the found project and subprojects JAR files."
 
 branding:
   icon: "upload-cloud"
