@@ -13,6 +13,9 @@ if grep -q "version" "$BUILD_FILE"; then
   # shellcheck disable=SC2207
   tmp=($(grep -Po "$VERSION_REGEX" "$BUILD_FILE"))
   version=${tmp[0]}
+  if [ "$version" == "" ]; then
+    version="*"
+  fi
 else
   exit 0
 fi
