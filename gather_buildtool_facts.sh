@@ -14,6 +14,7 @@ if grep -q "version" "$BUILD_FILE"; then
   tmp=($(grep -Po "$VERSION_REGEX" "$BUILD_FILE"))
   version=${tmp[0]}
   if [ "$version" == "" ]; then
+    echo "Could not find a version. Replacing with wildcard"
     version="*"
   fi
 else
