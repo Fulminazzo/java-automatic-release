@@ -41,6 +41,9 @@ for sub in $subprojects; do
   fi
 done
 
+if [ "$version" == "*" ]; then
+  version="UNKNOWN"
+fi
 echo "Found version: \"$version\""
 echo "Found files: \"$files\""
 
