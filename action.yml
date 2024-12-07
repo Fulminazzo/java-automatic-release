@@ -55,7 +55,11 @@ runs:
       run: |-
         chmod +x gradlew
         ./gradlew build
-        echo VARIABLES="build.gradle settings.gradle include build/libs/ (?<=version\s=\s(\"|'))([0-9.]+(-SNAPSHOT)?) (?<=include\s(\"|'))([^\"']+)" >> $GITHUB_OUTPUT
+        BUILD_DIR="build"
+        if [ ! -f "$BUILD_DIR" ] && [ -f "app/build.gradle" ]; then
+          BUILD_DIR="app/build"
+        fi
+        echo VARIABLES="$BUILD_DIR.gradle settings.gradle include $BUILD_DIR/libs/ (?<=version\s=\s(\"|'))([0-9.]+(-SNAPSHOT)?) (?<=include\s(\"|'))([^\"']+)" >> $GITHUB_OUTPUT
       shell: bash
     # Obtain the Project version and modules
     - name: Gather Project Info
