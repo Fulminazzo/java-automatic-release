@@ -41,6 +41,7 @@ while grep -q "^\s.*" <<< "$COMMIT_MESSAGE"; do
 	LEN=${#COMMIT_MESSAGE}
 	COMMIT_MESSAGE=${COMMIT_MESSAGE:1:$LEN}
 done
+echo "Releasing with commit message: \"$COMMIT_MESSAGE"
 
 # shellcheck disable=SC2086
 gh release create "$VERSION" \
