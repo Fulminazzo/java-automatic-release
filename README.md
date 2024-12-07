@@ -21,10 +21,11 @@ name: Automatic Release
 
 # Event to run on
 on:
-  # Will run on every push in the "main" branch
+  # Will run on every push in the "main" or "master" branch
   push:
     branches:
       - main
+      - master
 
 permissions:
   contents: write
@@ -34,9 +35,10 @@ jobs:
   release:
     name: Setup Environment, Build JAR and Release Project
     runs-on: ubuntu-latest
+    if: "startsWith(github.event.head_commit.message, '!release')"
     steps:
       - name: Automatic Release
-        uses: Fulminazzo/java-automatic-release@v1
+        uses: Fulminazzo/java-automatic-release@v3
         with:
           java-version: 8
         env:
