@@ -33,8 +33,14 @@ while [ $i -lt "$len" ]; do
   fi
   finalString="$finalString$char"
 done
-
 COMMIT_MESSAGE=$finalString
+
+# Removing !release from commit message
+COMMIT_MESSAGE=${COMMIT_MESSAGE#*!release}
+while grep -q "^\s.*" <<< "$COMMIT_MESSAGE"; do
+	LEN=${#COMMIT_MESSAGE}
+	COMMIT_MESSAGE=${COMMIT_MESSAGE:1:$LEN}
+done
 
 # shellcheck disable=SC2086
 gh release create "$VERSION" \
