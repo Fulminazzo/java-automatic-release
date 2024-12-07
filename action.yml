@@ -53,6 +53,7 @@ runs:
       id: gradle
       if: ${{ steps.getbuildtool.outputs.BUILD_TOOL == 'GRADLE' }}
       run: |-
+        chmod +x gradlew
         ./gradlew build
         echo VARIABLES="build.gradle settings.gradle include build/libs/ (?<=version\s=\s(\"|'))([0-9.]+(-SNAPSHOT)?) (?<=include\s(\"|'))([^\"']+)" >> $GITHUB_OUTPUT
       shell: bash
