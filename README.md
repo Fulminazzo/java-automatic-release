@@ -1,6 +1,8 @@
 # Automatic Release
 Automatic Release is a _composite_ GitHub Action that joins together multiple actions to automate your project releases.
 
+**Starting from version v3, it is now REQUIRED to prepend `!release` before the commit message for any commit that you want released.**
+
 It does so by:
 - setting up Java to the specified version in `with.java-version`;
 - find out what build tool you are using:
